@@ -32,3 +32,11 @@ class Feedback(CoreModel):
     corrected_category: str
     confidence: float
     timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class CategorizeRequest(BaseModel):
+    text: str = Field(..., description="Raw transaction SMS or bank statement text")
+
+class CategorizeResponse(BaseModel):
+    merchant: str
+    category: str
+    confidence: float

@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
 from prometheus_fastapi_instrumentator import Instrumentator
-
+from routers.v1 import router as v1_router 
 from database.mongo import db
 from database.milvus import vector_db
 
@@ -26,7 +26,7 @@ app = FastAPI(
 
 # Phase 11 Foresight: Initialize Prometheus Metrics Middleware
 Instrumentator().instrument(app).expose(app, endpoint="/metrics")
-
+app.include_router(v1_router)
 @app.get("/health", tags=["System"])
 async def health_check():
     """

@@ -1,0 +1,10 @@
+{
+  "swiggy": { "merchant": "Swiggy", "category": "Food" },
+  "zomato": { "merchant": "Zomato", "category": "Food" },
+  "uber": { "merchant": "Uber", "category": "Travel" },
+  "ola": { "merchant": "Ola", "category": "Travel" },
+  "netflix": { "merchant": "Netflix", "category": "Subscription" },
+  "spotify": { "merchant": "Spotify", "category": "Subscription" },
+  "amazon": { "merchant": "Amazon", "category": "Shopping" },
+  "starbucks": { "merchant": "Starbucks", "category": "Food" }
+}
