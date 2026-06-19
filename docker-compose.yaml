@@ -14,7 +14,7 @@ services:
       - MILVUS_HOST=10.10.10.130
       - MILVUS_PORT=19530
     ports:
-      - "985023:8000"
+      - "9850:8000"
     restart: always
     networks:
       - coolify
