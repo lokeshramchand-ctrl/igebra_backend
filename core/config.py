@@ -5,7 +5,7 @@ class Settings(BaseSettings):
     MONGODB_URI: str
     MONGODB_DB_NAME: str = "velar"
     
-    MILVUS_HOST: str = "milvus.lokeshrc.me"
+    MILVUS_HOST: str = "10.10.10.130"
     MILVUS_PORT: str = "19530"
 
     # Tell Pydantic to read from the .env file
