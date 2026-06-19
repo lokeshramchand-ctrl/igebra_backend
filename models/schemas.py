@@ -75,3 +75,22 @@ class MerchantProfile(BaseModel):
     confidence: float = 0.0
     category: Optional[str] = None
     subcategory: Optional[str] = None
+
+
+
+class TransactionCategory(str, Enum):
+    FOOD = "Food"
+    TRAVEL = "Travel"
+    ENTERTAINMENT = "Entertainment"
+    BILLS = "Bills"
+    FRIENDS = "Friends"
+    EDUCATION = "Education"
+    HEALTHCARE = "Healthcare"
+    UNKNOWN = "Unknown"
+
+class ConfidenceEvaluation(BaseModel):
+    raw_category: str
+    final_category: TransactionCategory
+    confidence: float
+    is_hallucination_risk: bool
+    calibration_applied: str
