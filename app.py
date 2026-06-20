@@ -4,6 +4,7 @@ from prometheus_fastapi_instrumentator import Instrumentator
 from routers.v1 import router as v1_router 
 from database.mongo import db
 from database.milvus import vector_db
+from pymilvus import connections
 
 # Lifespan context manager for startup and shutdown events
 @asynccontextmanager
@@ -33,10 +34,7 @@ async def health_check():
     Validates API operational status and database connectivity.
     """
     mongo_status = "connected" if db.client else "disconnected"
-    
-    # Check Milvus connection status
-    from pymilvus import connections
-    milvus_status = "connected" if connections.has_connection("default") else "disconnected"
+    milvus_status = "connected" if vector_db.client else "disconnected"
 
     return {
         "status": "healthy",
@@ -45,6 +43,7 @@ async def health_check():
             "milvus": milvus_status
         }
     }
+
 
 # Entry point for local development
 if __name__ == "__main__":
