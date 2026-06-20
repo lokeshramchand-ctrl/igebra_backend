@@ -1,7 +1,12 @@
 from pydantic import BaseModel, Field, ConfigDict
-from typing import Optional , List
+from typing import Optional , List ,Dict
 from datetime import datetime, timezone ,  timedelta
 from enum import Enum
+
+
+
+
+
 class CoreModel(BaseModel):
     model_config = ConfigDict(populate_by_name=True, arbitrary_types_allowed=True)
 
@@ -50,8 +55,6 @@ class ResolutionResult(BaseModel):
     resolution_method: str = Field(description="exact_alias, substring, rule_engine, or none")
 
 
-
-
 class MemoryState(str, Enum):
     EPHEMERAL = "EPHEMERAL"
     TEMPORARY = "TEMPORARY"
@@ -94,3 +97,25 @@ class ConfidenceEvaluation(BaseModel):
     confidence: float
     is_hallucination_risk: bool
     calibration_applied: str
+
+class BehaviorPattern(BaseModel):
+    id: Optional[str] = Field(alias="_id", default=None)
+    merchant_name: str  # Can be a resolved name or an "Unknown" entity string
+    
+    # Statistical Amount Metrics
+    avg_amount: float
+    median_amount: float
+    variance: float
+    std_dev: float
+    
+    # Temporal & Frequency Metrics
+    preferred_hour: int
+    time_bucket_distribution: Dict[str, float]  # e.g., {"morning": 0.7, "night": 0.3}
+    weekday_distribution: List[float]          # Length 7 array representing normalized frequency per day
+    daily_frequency: float                     # Average number of times seen per day
+    weekly_frequency: float                    # Average number of times seen per week
+    
+    # Advanced Intelligence Metrics
+    periodicity_score: float                   # 0.0 (highly random) to 1.0 (perfectly predictable interval)
+    entropy_score: float                       # Measures predictability of spending amounts
+    last_updated: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
