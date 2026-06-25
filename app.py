@@ -6,7 +6,7 @@ from database.mongo import db
 from database.milvus import vector_db
 from pymilvus import connections
 from routers.memory import router as memory_router  # <-- 1. Add this import
-
+from routers.analytics import router as analytics_router
 import logging
 
 # Configure logging globally
@@ -39,7 +39,7 @@ app = FastAPI(
 Instrumentator().instrument(app).expose(app, endpoint="/metrics")
 app.include_router(v1_router)
 app.include_router(memory_router)  # <-- 2. Register the memory router here
-
+app.include_router(analytics_router)
 @app.get("/health", tags=["System"])
 async def health_check():
     mongo_status = "connected" if db.client else "disconnected"

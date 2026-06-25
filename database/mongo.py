@@ -18,6 +18,11 @@ class MongoDB:
         cls.feedback = cls.db.get_collection("feedback")
         cls.categories = cls.db.get_collection("categories")
         cls.merchants = cls.db.get_collection("merchants")
+
+        cls.merchant_profiles = cls.db.get_collection("merchant_profiles")
+        cls.behavior_patterns = cls.db.get_collection("behavior_patterns")
+        cls.retraining_queue = cls.db.get_collection("retraining_queue")
+
         logger.info("MongoDB connected.")
 
     @classmethod

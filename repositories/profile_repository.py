@@ -6,7 +6,7 @@ logger = logging.getLogger(__name__)
 
 class ProfileRepository:
     async def get_profile(self, canonical_name: str) -> Optional[MerchantProfile]:
-        data = await db.merchant_profiles.find_one({"canonical_name": canonical_name})
+        data = await db.merchant_profiles.find_one({"canonical_name": canonical_name}, {"_id": 0})      
         if data:
             return MerchantProfile(**data)
         return None

@@ -6,5 +6,6 @@
   "netflix": { "merchant": "Netflix", "category": "Subscription" },
   "spotify": { "merchant": "Spotify", "category": "Subscription" },
   "amazon": { "merchant": "Amazon", "category": "Shopping" },
-  "starbucks": { "merchant": "Starbucks", "category": "Food" }
+  "starbucks": { "merchant": "Starbucks", "category": "Food" },
+  "bundl": { "merchant": "Swiggy", "category": "Food" }
 }
