@@ -52,10 +52,10 @@ Instrumentator().instrument(app).expose(app, endpoint="/metrics")
 
 # Mount internal routers (V1 requires API Key)
 app.include_router(v1.router, dependencies=[Depends(validate_api_key)])
-app.include_router(memory.router)
-app.include_router(analytics.router)
-app.include_router(rag.router)
-app.include_router(observability_router)
+app.include_router(memory.router, dependencies=[Depends(validate_api_key)])
+app.include_router(analytics.router, dependencies=[Depends(validate_api_key)])
+app.include_router(rag.router, dependencies=[Depends(validate_api_key)])
+app.include_router(observability_router, dependencies=[Depends(validate_api_key)])
 
 
 @app.post("/v1/categorize", dependencies=[Depends(validate_api_key)], tags=["Public API"])

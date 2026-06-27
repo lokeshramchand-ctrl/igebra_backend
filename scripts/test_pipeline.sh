@@ -2,6 +2,18 @@
 
 BASE_URL="http://localhost:8080"
 
+# Default fallback key (matches the hardcoded fallback in core/security.py)
+API_KEY="velar_test_key_123"
+
+# Safely attempt to load VELAR_API_KEY from .env if it exists in the current directory
+if [ -f ".env" ]; then
+    PARSED_KEY=$(grep -v '^#' .env | grep -E '^VELAR_API_KEY=' | cut -d '=' -f2 | tr -d '"' | tr -d "'")
+    if [ ! -z "$PARSED_KEY" ]; then
+        API_KEY="$PARSED_KEY"
+        echo "🔒 Loaded API Key from .env file"
+    fi
+fi
+
 echo -e "\n============================================="
 echo "  VELAR TRANSACTION ENGINE - E2E TEST "
 echo -e "=============================================\n"
@@ -11,6 +23,7 @@ echo "Sending noisy UPI string: 'UPI/CR/3152671239/BUNDL TECHNOLOGIES/HDFC'"
 curl -s -X POST "$BASE_URL/v1/resolve" \
   -H "accept: application/json" \
   -H "Content-Type: application/json" \
+  -H "X-Velar-API-Key: $API_KEY" \
   -d "{\"text\": \"UPI/CR/3152671239/BUNDL TECHNOLOGIES/HDFC\"}"
 echo -e "\n\n"
 sleep 1
@@ -23,6 +36,7 @@ do
    curl -s -X POST "$BASE_URL/memory/update" \
      -H "accept: application/json" \
      -H "Content-Type: application/json" \
+     -H "X-Velar-API-Key: $API_KEY" \
      -d "{\"canonical_name\": \"Zomato\", \"raw_text\": \"paid to zomato media pvt\"}"
    echo -e "\n"
 done
@@ -34,15 +48,33 @@ echo "Evaluating a low-confidence ML prediction (Confidence: 0.40). Should route
 curl -s -X POST "$BASE_URL/v1/confidence/evaluate" \
   -H "accept: application/json" \
   -H "Content-Type: application/json" \
+  -H "X-Velar-API-Key: $API_KEY" \
   -d "{\"predicted_category\": \"Travel\", \"raw_confidence\": 0.40}"
 echo -e "\n\n"
 sleep 1
 
+echo -e "--- PREPARING MOCK DATA FOR ANALYTICS ---"
+# Run the python seeder script from the backend directory
+python scripts/mock_seeder.py
+echo -e "\n"
+sleep 1
+
 echo -e "--- PHASE 13: ANALYTICS ENGINE ---"
-echo "Fetching top merchants (Should include our newly added test data)."
-curl -s -X GET "$BASE_URL/v1/analytics/patterns/merchants?limit=5" \
-  -H "accept: application/json"
+echo "1. Fetching top merchants (Ranked by visit frequency):"
+curl -s -X GET "$BASE_URL/v1/analytics/patterns/merchants?limit=3" \
+  -H "accept: application/json" \
+  -H "X-Velar-API-Key: $API_KEY"
 echo -e "\n\n"
+
+echo "2. Fetching category breakdown (Last 30 days):"
+curl -s -X GET "$BASE_URL/v1/analytics/patterns/categories?days=30" \
+  -H "accept: application/json" \
+  -H "X-Velar-API-Key: $API_KEY"
+echo -e "\n\n"
+
+echo -e "--- CLEANING UP MOCK DATA ---"
+python scripts/mock_seeder.py cleanup
+echo -e "\n"
 
 echo -e "============================================="
 echo "  TEST COMPLETE"
