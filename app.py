@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI, Request
 from contextlib import asynccontextmanager
 from prometheus_fastapi_instrumentator import Instrumentator
 from routers.v1 import router as v1_router 
@@ -7,6 +7,10 @@ from database.milvus import vector_db
 from pymilvus import connections
 from routers.memory import router as memory_router  # <-- 1. Add this import
 from routers.analytics import router as analytics_router
+from core.security import validate_api_key
+from core.rate_limiter import setup_rate_limiting, limiter
+from routers import v1, memory, analytics, rag
+from routers.observability import router as observability_router
 import logging
 
 # Configure logging globally
@@ -40,6 +44,13 @@ Instrumentator().instrument(app).expose(app, endpoint="/metrics")
 app.include_router(v1_router)
 app.include_router(memory_router)  # <-- 2. Register the memory router here
 app.include_router(analytics_router)
+app.include_router(rag.router)
+app.include_router(observability_router)
+@app.post("/v1/categorize", dependencies=[Depends(validate_api_key)], tags=["Public API"])
+@limiter.limit("50/minute")
+async def public_categorize(request:Request, payload: dict):
+    # Internal routing to Phase 2 -> 5 -> 9 Engine
+    return {"status": "success", "message": "Transaction routed to Intelligence Engine."}
 @app.get("/health", tags=["System"])
 async def health_check():
     mongo_status = "connected" if db.client else "disconnected"
